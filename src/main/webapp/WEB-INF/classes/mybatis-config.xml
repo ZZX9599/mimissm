@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!--日志文件-->
+    <settings>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+
+    <!--别名-->
+    <typeAliases>
+        <package name="com.zzx.domain"/>
+        <package name="com.zzx.vo"/>
+    </typeAliases>
+
+    <!--分页插件的配置-->
+    <!--实际上是在执行sql语句之前进行拦截，追加limit分页条件-->
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor"></plugin>
+    </plugins>
+
+    <!--sql映射文件的位置-->
+    <mappers>
+        <package name="com.zzx.mapper"/>
+    </mappers>
+
+</configuration>

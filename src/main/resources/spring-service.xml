@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--组件扫描-->
+    <context:component-scan base-package="com.zzx.service"/>
+    <!--1:声明事务管理器-->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+        <!--管理事务，必须声明数据源-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--2:声明方法需要的事务类型（配置方法的事务属性【隔离级别，传播行为，超时】-->
+    <tx:advice id="advice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!--需要配置事务的方法，可以有多个-->
+            <!--name:写法1【完整的方法名，不带有包和类名】 2【可以使用通配符*】-->
+            <!--propagation:传播行为-->
+            <!--isolation:隔离级别-->
+            <!--read-only:是否只读-->
+            <!--rollback-for:出现异常回滚，全限定类名-->
+
+            <!--查询-->
+            <tx:method name="*select*" read-only="true"/>
+            <tx:method name="*find*" read-only="true"/>
+            <tx:method name="*get*" read-only="true"/>
+            <tx:method name="*search*" read-only="true"/>
+
+            <!--添加-->
+            <tx:method name="*insert*" propagation="REQUIRED"/>
+            <tx:method name="*add*" propagation="REQUIRED"/>
+            <tx:method name="*save*" propagation="REQUIRED"/>
+
+            <!--删除-->
+            <tx:method name="*delete*" propagation="REQUIRED"/>
+            <tx:method name="*remove*" propagation="REQUIRED"/>
+            <tx:method name="*clear*" propagation="REQUIRED"/>
+
+            <!--更新-->
+            <tx:method name="*update*" propagation="REQUIRED"/>
+            <tx:method name="*modify*" propagation="REQUIRED"/>
+            <tx:method name="*change*" propagation="REQUIRED"/>
+            <tx:method name="*set*" propagation="REQUIRED"/>
+
+            <!--不包含以上的，都支持事务-->
+            <!--如果当前方法有事务，就支持当前事务，没有就以非事务运行-->
+            <tx:method name="*" propagation="SUPPORTS"/>
+
+        </tx:attributes>
+    </tx:advice>
+    
+    <!--3:配置aop：指定哪些哪类要创建代理-->
+    <!--配置切面的执行时间和位置-->
+    <!--配置切入点表达式，指定那些包的类，要使用事务-->
+    <!--id[切入点表达式名称，唯一值]-->
+    <!--expression[切入点表达式，指定哪些使用事务，aspectj会创建代理对象-->
+    <!--弥补上面advice里面只写了方法名，所以在这里的切入点表达式里面补充包名-->
+    <aop:config>
+        <!--配置切入点-->
+        <aop:pointcut id="myPointCut" expression="execution(* com.zzx.service.*.*(..))"/>
+        <!--配置增强器：关联advice和pointcut-->
+        <aop:advisor advice-ref="advice" pointcut-ref="myPointCut"/>
+    </aop:config>
+</beans>
